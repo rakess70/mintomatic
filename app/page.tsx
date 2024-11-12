@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Connection } from "@solana/web3.js";
-import { fetchCandyMachineData } from "./lib/candyMachine";
+import { fetchCandyMachineData } from "./lib/metaplexService";
 
 export default function Home() {
   const [referralID, setReferralID] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export default function Home() {
     // Fetch Candy Machine Data
     const fetchData = async () => {
       try {
-        const data = await fetchCandyMachineData(candyMachineId, connection);
+        const data = await fetchCandyMachineData(candyMachineId);
         console.log("Fetched Candy Machine Data on Mint Page:", data); // Log the fetched data for debugging
         setCandyMachineData(data);
       } catch (error) {
