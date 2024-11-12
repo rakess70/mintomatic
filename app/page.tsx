@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CrossmintPayButton } from "@crossmint/client-sdk-react-ui";
 import { Connection } from "@solana/web3.js";
 import { fetchCandyMachineData } from "./lib/candyMachine";
 
@@ -91,16 +90,7 @@ export default function Home() {
             Price: {candyMachineData.price} {candyMachineData.currency} + minting fees
           </p>
           <div className="mt-6">
-            <CrossmintPayButton
-              projectId={projectId}
-              collectionId={collectionId}
-              environment={environment}
-              checkoutProps={{
-                paymentMethods: ["SOL", "fiat"], // Still include fiat options
-                display: "same-tab",
-              }}
-              whPassThroughArgs={{ referer: referralID }} // Pass referral code here
-            />
+            // mint button
           </div>
         </div>
 
