@@ -4,6 +4,7 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { mplTokenMetadata, fetchMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { mplCandyMachine, fetchCandyMachine, fetchCandyGuard } from "@metaplex-foundation/mpl-candy-machine";
 import { publicKey } from "@metaplex-foundation/umi";
+import { base58 } from "@metaplex-foundation/umi/serializers"; // Correct deserializer for base58
 
 // Initialize Umi instance with plugins for Candy Machine and Token Metadata
 const umi = createUmi(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com")
@@ -71,4 +72,28 @@ export async function fetchCandyMachineData(candyMachineId: string) {
     console.error("Failed to fetch Candy Machine data:", error);
     return null;
   }
+}
+
+
+/**
+ * Fetches the transaction cost based on the given transaction ID.
+ * @param txId - The transaction ID in base58 format.
+ * @returns The cost of the transaction in SOL.
+ */
+export async function fetchTransactionCost(txId: string): Promise<number> {
+    try {
+        // Convert the base58 transaction ID string to Uint8Array
+        const txIdUint8Array = base58.serialize(txId);
+
+        // Fetch the transaction using the Uint8Array version of txId
+        const transaction = await umi.rpc.getTransaction(txIdUint8Array);
+        if (!transaction || !transaction.meta) throw new Error("Transaction not found");
+
+        // Calculate the cost of the transaction (includes fees)
+        const costInLamports = Number(transaction.meta.fee);
+        return costInLamports / 1e9; // Convert from lamports to SOL
+    } catch (error) {
+        console.error("Failed to fetch transaction cost:", error);
+        return 0;
+    }
 }
