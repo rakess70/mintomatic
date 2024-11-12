@@ -23,7 +23,7 @@ export default function RootLayout({
       <head></head>
       <body className={inter.className}>
         <WalletProviderWrapper>
-          <ConnectButton />  {/* Add the ConnectButton here */}
+          <ConnectButton />
           {children}
         </WalletProviderWrapper>
       </body>

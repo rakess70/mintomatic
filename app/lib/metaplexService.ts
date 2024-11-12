@@ -4,7 +4,7 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { mplTokenMetadata, fetchMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { mplCandyMachine, fetchCandyMachine, fetchCandyGuard } from "@metaplex-foundation/mpl-candy-machine";
 import { publicKey } from "@metaplex-foundation/umi";
-import { base58 } from "@metaplex-foundation/umi/serializers"; // Correct deserializer for base58
+import { base58 } from "@metaplex-foundation/umi/serializers";
 
 // Initialize Umi instance with plugins for Candy Machine and Token Metadata
 const umi = createUmi(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com")
@@ -16,6 +16,28 @@ const umi = createUmi(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet
  */
 function hasAmount<T>(guard: T | null): guard is T & { amount: bigint } {
   return guard !== null && typeof (guard as any).amount === "bigint";
+}
+
+/**
+ * Fetches NFT metadata using its mint address.
+ * @param mintAddress - The mint address of the NFT.
+ * @returns The metadata JSON of the NFT.
+ */
+export async function fetchNFTMetadata(mintAddress: string) {
+  try {
+    const mintPubkey = publicKey(mintAddress);
+    const metadata = await fetchMetadata(umi, mintPubkey);
+
+    // Fetch metadata JSON from the URI
+    if (metadata.uri) {
+      const response = await fetch(metadata.uri);
+      return await response.json();
+    }
+    return null;
+  } catch (error) {
+    console.error("Failed to fetch NFT metadata:", error);
+    return null;
+  }
 }
 
 /**
@@ -74,26 +96,25 @@ export async function fetchCandyMachineData(candyMachineId: string) {
   }
 }
 
-
 /**
  * Fetches the transaction cost based on the given transaction ID.
  * @param txId - The transaction ID in base58 format.
  * @returns The cost of the transaction in SOL.
  */
 export async function fetchTransactionCost(txId: string): Promise<number> {
-    try {
-        // Convert the base58 transaction ID string to Uint8Array
-        const txIdUint8Array = base58.serialize(txId);
+  try {
+    // Convert the base58 transaction ID string to Uint8Array
+    const txIdUint8Array = base58.serialize(txId);
 
-        // Fetch the transaction using the Uint8Array version of txId
-        const transaction = await umi.rpc.getTransaction(txIdUint8Array);
-        if (!transaction || !transaction.meta) throw new Error("Transaction not found");
+    // Fetch the transaction using the Uint8Array version of txId
+    const transaction = await umi.rpc.getTransaction(txIdUint8Array);
+    if (!transaction || !transaction.meta) throw new Error("Transaction not found");
 
-        // Calculate the cost of the transaction (includes fees)
-        const costInLamports = Number(transaction.meta.fee);
-        return costInLamports / 1e9; // Convert from lamports to SOL
-    } catch (error) {
-        console.error("Failed to fetch transaction cost:", error);
-        return 0;
-    }
+    // Calculate the cost of the transaction (includes fees)
+    const costInLamports = Number(transaction.meta.fee);
+    return costInLamports / 1e9; // Convert from lamports to SOL
+  } catch (error) {
+    console.error("Failed to fetch transaction cost:", error);
+    return 0;
+  }
 }

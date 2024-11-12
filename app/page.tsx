@@ -90,7 +90,7 @@ export default function Home() {
             Price: {candyMachineData.price} {candyMachineData.currency} + minting fees
           </p>
           <div className="mt-6">
-            // mint button
+            <p> mint button</p>
           </div>
         </div>
 
