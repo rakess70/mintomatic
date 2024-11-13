@@ -89,7 +89,7 @@ export default function Home() {
             {mintMethod === "credit-card" && (
               <div className="credit-card-minting">
                 <WalletStatus onConnectionChange={setIsWalletConnected} label="Connect Wallet (optional)" />
-                <CreditCardMint />
+                <div className="mt-6"><CreditCardMint /></div>
               </div>
             )}
           </div>
