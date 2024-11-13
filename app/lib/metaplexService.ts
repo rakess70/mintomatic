@@ -29,7 +29,7 @@ export async function fetchCandyMachineData(candyMachineId: string) {
 
     // Fetch Candy Machine data
     const candyMachine = await fetchCandyMachine(umi, candyMachineAddress);
-    console.log("Candy Machine Data:", candyMachine);
+    // console.log("Candy Machine Data:", candyMachine);
 
     if (!candyMachine) {
       console.error("Candy Machine not found at the provided address.");
@@ -45,14 +45,14 @@ export async function fetchCandyMachineData(candyMachineId: string) {
     if (candyMachine.collectionMint) {
       try {
         const digitalAsset = await fetchDigitalAsset(umi, candyMachine.collectionMint);
-        console.log("Digital Asset:", digitalAsset);
+        // console.log("Digital Asset:", digitalAsset);
 
         // Ensure the digitalAsset has metadata with a URI to fetch further details
         if (digitalAsset.metadata.uri) {
           const response = await fetch(digitalAsset.metadata.uri);
           if (response.ok) {
             const metadataJson = await response.json();
-            console.log("Metadata JSON:", metadataJson);
+            // console.log("Metadata JSON:", metadataJson);
             collectionImage = metadataJson.image || "";
             collectionName = metadataJson.name || "";
           } else {

@@ -12,8 +12,7 @@ export default function Home() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isMinted, setIsMinted] = useState(false);
-  const [address, setAddress] = useState<string | null>(null); // Store the connected wallet address
-
+  const [address, setAddress] = useState<string | null>(null);
   const candyMachineId = process.env.NEXT_PUBLIC_SOLANA_CANDY_MACHINE_ID as string;
 
   useEffect(() => {
