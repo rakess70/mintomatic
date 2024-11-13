@@ -14,7 +14,7 @@ const solanaWeb3JsAdapter = new SolanaAdapter({
 });
 
 // Use your Reown Cloud project ID
-const projectId = 'YOUR_PROJECT_ID';
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
 // Optional metadata for AppKit
 const metadata = {
