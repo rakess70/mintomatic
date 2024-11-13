@@ -73,13 +73,11 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Wallet Status */}
-          <WalletStatus onConnectionChange={setIsWalletConnected} />
-
           {/* Tab Content */}
           <div className="p-4 bg-gray-800 rounded-lg text-center">
             {mintMethod === "wallet" && (
               <div className="wallet-minting">
+                <WalletStatus onConnectionChange={setIsWalletConnected} label="Connect Wallet" />
                 {isWalletConnected ? (
                   <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Mint NFT with Wallet</button>
                 ) : (
@@ -90,6 +88,7 @@ export default function Home() {
 
             {mintMethod === "credit-card" && (
               <div className="credit-card-minting">
+                <WalletStatus onConnectionChange={setIsWalletConnected} label="Connect Wallet (optional)" />
                 <CreditCardMint />
               </div>
             )}

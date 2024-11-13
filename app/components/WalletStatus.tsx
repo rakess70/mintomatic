@@ -3,7 +3,12 @@
 import React, { useEffect } from "react";
 import { useAppKit, useAppKitAccount, useDisconnect } from "@reown/appkit/react";
 
-export default function WalletStatus({ onConnectionChange }: { onConnectionChange?: (connected: boolean) => void }) {
+interface WalletStatusProps {
+  onConnectionChange?: (connected: boolean) => void;
+  label?: string;
+}
+
+export default function WalletStatus({ onConnectionChange, label = "Connect Wallet" }: WalletStatusProps) {
   const { open } = useAppKit();
   const { address, isConnected } = useAppKitAccount();
   const { disconnect } = useDisconnect();
@@ -25,7 +30,7 @@ export default function WalletStatus({ onConnectionChange }: { onConnectionChang
         </div>
       ) : (
         <button onClick={() => open({ view: "Connect" })} className="px-4 py-2 bg-blue-500 text-white rounded">
-          Connect Wallet
+          {label}
         </button>
       )}
     </div>
