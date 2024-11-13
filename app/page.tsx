@@ -1,26 +1,17 @@
-// app/page.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
-import { Connection } from "@solana/web3.js";
 import { fetchCandyMachineData } from "./lib/metaplexService";
+import WalletStatus from "./components/WalletStatus";
 import CreditCardMint from "./components/CreditCardMint";
-import ConnectButton from "./components/ConnectButton";
-import { useAppKitAccount } from "@reown/appkit/react"; // Access wallet address and connection status
 
 export default function Home() {
-  const [referralID, setReferralID] = useState<string | null>(null);
   const [candyMachineData, setCandyMachineData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mintMethod, setMintMethod] = useState<"wallet" | "credit-card">("wallet");
-  
-  const candyMachineId = process.env.NEXT_PUBLIC_SOLANA_CANDY_MACHINE_ID as string;
-  const solanaRpc = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
-  const defaultReferralCode = process.env.NEXT_PUBLIC_REFERRAL_RADIUS_DEFAULT_CODE || "DEFAULT-REFERRAL-CODE";
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
 
-  // AppKit account hook to access wallet address and connection status
-  const { isConnected, address } = useAppKitAccount();
+  const candyMachineId = process.env.NEXT_PUBLIC_SOLANA_CANDY_MACHINE_ID as string;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,32 +25,18 @@ export default function Home() {
       }
     };
 
-    const urlString = new URL(window.location.href);
-    const referral = urlString.searchParams.get("rr");
-    setReferralID(referral || defaultReferralCode);
-
     fetchData();
-  }, [candyMachineId, solanaRpc, defaultReferralCode]);
+  }, [candyMachineId]);
 
-  if (loading) {
-    return <p className="text-center text-white">Loading...</p>;
-  }
-
-  if (!candyMachineData) {
-    return <p className="text-center text-white">Failed to load Candy Machine data.</p>;
-  }
-
-  // Helper to format the wallet address
-  const formatAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-6)}`;
+  if (loading) return <p className="text-center text-white">Loading...</p>;
+  if (!candyMachineData) return <p className="text-center text-white">Failed to load Candy Machine data.</p>;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
       <div className="w-full max-w-4xl mx-auto flex flex-col md:flex-row p-6 bg-gray-900 rounded-lg">
         {/* Left Column */}
         <div className="md:w-1/2 md:pr-6 mb-6 md:mb-0 text-center">
-          <h1 className="text-3xl font-bold mb-4">
-            Mint Your {candyMachineData.collectionName} NFT
-          </h1>
+          <h1 className="text-3xl font-bold mb-4">Mint Your {candyMachineData.collectionName} NFT</h1>
           <p className="text-lg text-gray-300 mb-4">
             Join the exclusive collection of {candyMachineData.itemsAvailable} unique NFTs!
           </p>
@@ -96,23 +73,17 @@ export default function Home() {
             </button>
           </div>
 
+          {/* Wallet Status */}
+          <WalletStatus onConnectionChange={setIsWalletConnected} />
+
           {/* Tab Content */}
           <div className="p-4 bg-gray-800 rounded-lg text-center">
             {mintMethod === "wallet" && (
               <div className="wallet-minting">
-                <ConnectButton />
-
-                {isConnected && (
-                  <div className="mt-4">
-                    {/* Wallet Address Label */}
-                    <div className="mb-2 p-2 bg-gray-700 text-gray-300 rounded">
-                      Connected Wallet: <span className="font-mono">{formatAddress(address)}</span>
-                    </div>
-                    {/* Mint Button */}
-                    <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
-                      Mint NFT with Wallet
-                    </button>
-                  </div>
+                {isWalletConnected ? (
+                  <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Mint NFT with Wallet</button>
+                ) : (
+                  <p className="text-gray-400">Please connect your wallet to mint with Solana.</p>
                 )}
               </div>
             )}
