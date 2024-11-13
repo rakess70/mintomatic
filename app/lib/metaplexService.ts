@@ -18,11 +18,6 @@ function hasAmount<T>(guard: T | null): guard is T & { amount: bigint } {
   return guard !== null && typeof (guard as any).amount === "bigint";
 }
 
-
-
-
-
-
 /**
  * Fetches Candy Machine data along with its collection metadata and guard settings.
  * @param candyMachineId - The ID of the Candy Machine.
@@ -34,7 +29,6 @@ export async function fetchCandyMachineData(candyMachineId: string) {
 
     // Fetch Candy Machine data
     const candyMachine = await fetchCandyMachine(umi, candyMachineAddress);
-
     console.log("Candy Machine Data:", candyMachine);
     
     if (!candyMachine) {
@@ -52,7 +46,6 @@ export async function fetchCandyMachineData(candyMachineId: string) {
       try {
         const metadata = await fetchMetadata(umi, candyMachine.collectionMint);
         
-
         if (metadata && metadata.uri) {
           const response = await fetch(metadata.uri);
           console.log("Response status:", response.status);
@@ -82,7 +75,6 @@ export async function fetchCandyMachineData(candyMachineId: string) {
       if (hasAmount(tokenPayment)) {
         price = Number(tokenPayment.amount) / 1_000_000; // Assuming USDC with 6 decimals
         currency = "USDC";
-        // console.log("Token payment guard found:", price, currency);
       } else {
         console.warn("tokenPayment guard does not contain a valid amount.");
       }
@@ -91,7 +83,6 @@ export async function fetchCandyMachineData(candyMachineId: string) {
       if (hasAmount(solPayment)) {
         price = Number(solPayment.amount) / 1_000_000_000;
         currency = "SOL";
-        // console.log("SOL payment guard found:", price, currency);
       } else {
         console.warn("solPayment guard does not contain a valid amount.");
       }
@@ -113,15 +104,6 @@ export async function fetchCandyMachineData(candyMachineId: string) {
     return null;
   }
 }
-
-
-
-
-
-
-
-
-
 
 /**
  * Fetches the transaction cost based on the given transaction ID.
@@ -145,11 +127,6 @@ export async function fetchTransactionCost(txId: string): Promise<number> {
     return 0;
   }
 }
-
-
-
-
-
 
 /**
  * Fetches NFT metadata using its mint address.
