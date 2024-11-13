@@ -1,10 +1,10 @@
 // components/WalletStatus.tsx
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAppKitAccount, useDisconnect, useAppKit } from "@reown/appkit/react";
 
 interface WalletStatusProps {
-  onConnectionChange?: (isConnected: boolean) => void;
+  onConnectionChange?: (isConnected: boolean, walletAddress: string | null) => void;
   label?: string;
 }
 
@@ -26,9 +26,9 @@ export default function WalletStatus({ onConnectionChange, label = "Connect Wall
   // Notify parent of connection changes
   useEffect(() => {
     if (onConnectionChange) {
-      onConnectionChange(isConnected);
+      onConnectionChange(isConnected, address || null); // Pass both connection status and address
     }
-  }, [isConnected, onConnectionChange]);
+  }, [isConnected, address, onConnectionChange]);
 
   return (
     <div className="flex flex-col items-center">

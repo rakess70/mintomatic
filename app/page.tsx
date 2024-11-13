@@ -1,5 +1,3 @@
-// app/page.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14,9 +12,9 @@ export default function Home() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isMinted, setIsMinted] = useState(false);
+  const [address, setAddress] = useState<string | null>(null); // Store the connected wallet address
 
   const candyMachineId = process.env.NEXT_PUBLIC_SOLANA_CANDY_MACHINE_ID as string;
-  const address = ""; // This should be your connected wallet address if using a wallet provider
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,6 +31,12 @@ export default function Home() {
     fetchData();
   }, [candyMachineId]);
 
+  // Function to update wallet connection status and address
+  const handleWalletConnectionChange = (connected: boolean, walletAddress: string | null) => {
+    setIsWalletConnected(connected);
+    setAddress(walletAddress); // Update address based on wallet connection
+  };
+
   // Minting function
   const mintNFTWithWallet = async () => {
     if (!isWalletConnected || !address) {
@@ -42,6 +46,7 @@ export default function Home() {
 
     setIsMinting(true);
     try {
+      console.log("Attempting to mint with wallet address:", address);
       const response = await fetch("/api/mint", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -111,7 +116,7 @@ export default function Home() {
           <div className="p-4 bg-gray-800 rounded-lg text-center">
             {mintMethod === "wallet" && (
               <div className="wallet-minting">
-                <WalletStatus onConnectionChange={setIsWalletConnected} label="Connect Wallet" />
+                <WalletStatus onConnectionChange={handleWalletConnectionChange} label="Connect Wallet" />
                 {isWalletConnected ? (
                   <button
                     onClick={mintNFTWithWallet}
@@ -128,7 +133,7 @@ export default function Home() {
 
             {mintMethod === "credit-card" && (
               <div className="credit-card-minting">
-                <WalletStatus onConnectionChange={setIsWalletConnected} label="Connect Wallet (optional)" />
+                <WalletStatus onConnectionChange={handleWalletConnectionChange} label="Connect Wallet (optional)" />
                 <div className="mt-6"><CreditCardMint /></div>
               </div>
             )}
