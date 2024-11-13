@@ -30,6 +30,12 @@ export default function WalletStatus({ onConnectionChange, label = "Connect Wall
     }
   }, [isConnected, address, onConnectionChange]);
 
+  const handleOpen = () => {
+    open({
+      view: "Connect", // Open wallet connect modal
+    });
+  };
+
   return (
     <div className="flex flex-col items-center">
       {isConnected ? (
@@ -41,7 +47,7 @@ export default function WalletStatus({ onConnectionChange, label = "Connect Wall
         </>
       ) : (
         <button
-          onClick={() => open({ view: "Connect" })}
+          onClick={handleOpen} // Call handleOpen without chainId and rpc
           className="px-4 py-2 bg-blue-500 text-white rounded"
         >
           {label}

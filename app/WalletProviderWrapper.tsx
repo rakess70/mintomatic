@@ -4,17 +4,25 @@ import React, { useMemo } from "react";
 import { createAppKit } from "@reown/appkit/react";
 import { SolanaAdapter } from "@reown/appkit-adapter-solana/react";
 import { solana, solanaTestnet, solanaDevnet } from "@reown/appkit/networks";
-import { SolflareWalletAdapter } from "@solana/wallet-adapter-wallets"; // Removed PhantomWalletAdapter
+import { SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { WalletProvider, ConnectionProvider } from "@solana/wallet-adapter-react";
-import { clusterApiUrl } from "@solana/web3.js";
+
+// Environment variables
+const network = process.env.NEXT_PUBLIC_SOLANA_NETWORK || "devnet";
+const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC;
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+
+// Map the network to the correct Solana network configuration with RPC
+const solanaNetwork = network === "mainnet-beta"
+  ? { ...solana, rpcUrl }
+  : network === "testnet"
+  ? { ...solanaTestnet, rpcUrl }
+  : { ...solanaDevnet, rpcUrl }; // default to devnet
 
 // Set up the Solana Adapter with supported wallets, omitting Phantom
 const solanaWeb3JsAdapter = new SolanaAdapter({
   wallets: [new SolflareWalletAdapter()],
 });
-
-// Use your Reown Cloud project ID
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
 // Metadata for AppKit
 const metadata = {
@@ -27,7 +35,7 @@ const metadata = {
 // Initialize AppKit outside the component to prevent rerenders
 createAppKit({
   adapters: [solanaWeb3JsAdapter],
-  networks: [solana, solanaTestnet, solanaDevnet],
+  networks: [solanaNetwork], // Use the dynamically mapped solanaNetwork
   metadata: metadata,
   projectId,
   features: {
@@ -37,9 +45,8 @@ createAppKit({
 
 // Component Function
 export default function WalletProviderWrapper({ children }: { children: React.ReactNode }) {
-  // Define network endpoint for Solana
-  const network = "mainnet-beta"; // Can be "mainnet-beta", "devnet", or "testnet"
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  // Use the environment RPC endpoint directly
+  const endpoint = useMemo(() => rpcUrl, [rpcUrl]);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
