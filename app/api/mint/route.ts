@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PublicKey as SolanaPublicKey } from '@solana/web3.js';
-import { mintV2 } from '@metaplex-foundation/mpl-candy-machine'; // Import TokenStandard
+import { mintV2 } from '@metaplex-foundation/mpl-candy-machine';
 import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
 import { transactionBuilder, generateSigner, PublicKey as UmiPublicKey } from '@metaplex-foundation/umi';
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
@@ -12,7 +12,8 @@ const umi = createUmi(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.devnet.
   .use(mplTokenMetadata())
   .use(mplCandyMachine());
 
-export default async function mintHandler(req: NextApiRequest, res: NextApiResponse) {
+// Define the POST handler for minting
+export async function POST(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
