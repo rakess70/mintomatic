@@ -7,20 +7,20 @@ import { Connection } from "@solana/web3.js";
 import { fetchCandyMachineData } from "./lib/metaplexService";
 import CreditCardMint from "./components/CreditCardMint";
 import ConnectButton from "./components/ConnectButton";
-import { useAppKitAccount } from "@reown/appkit/react"; // Import the AppKit hook
+import { useAppKitAccount } from "@reown/appkit/react"; // Access wallet address and connection status
 
 export default function Home() {
   const [referralID, setReferralID] = useState<string | null>(null);
   const [candyMachineData, setCandyMachineData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mintMethod, setMintMethod] = useState<"wallet" | "credit-card">("wallet");
-
+  
   const candyMachineId = process.env.NEXT_PUBLIC_SOLANA_CANDY_MACHINE_ID as string;
   const solanaRpc = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
   const defaultReferralCode = process.env.NEXT_PUBLIC_REFERRAL_RADIUS_DEFAULT_CODE || "DEFAULT-REFERRAL-CODE";
 
-  // AppKit hook to access account and connection status
-  const { address, isConnected } = useAppKitAccount();
+  // AppKit account hook to access wallet address and connection status
+  const { isConnected, address } = useAppKitAccount();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +48,9 @@ export default function Home() {
   if (!candyMachineData) {
     return <p className="text-center text-white">Failed to load Candy Machine data.</p>;
   }
+
+  // Helper to format the wallet address
+  const formatAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-6)}`;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
@@ -97,18 +100,19 @@ export default function Home() {
           <div className="p-4 bg-gray-800 rounded-lg text-center">
             {mintMethod === "wallet" && (
               <div className="wallet-minting">
-                {/* Display wallet address if connected, else show ConnectButton */}
-                {isConnected ? (
-                  <div>
-                    <p className="text-sm text-gray-400 mb-2">
-                      Connected Wallet: <span className="text-white">{address}</span>
-                    </p>
-                    <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+                <ConnectButton />
+
+                {isConnected && (
+                  <div className="mt-4">
+                    {/* Wallet Address Label */}
+                    <div className="mb-2 p-2 bg-gray-700 text-gray-300 rounded">
+                      Connected Wallet: <span className="font-mono">{formatAddress(address)}</span>
+                    </div>
+                    {/* Mint Button */}
+                    <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
                       Mint NFT with Wallet
                     </button>
                   </div>
-                ) : (
-                  <ConnectButton />
                 )}
               </div>
             )}
