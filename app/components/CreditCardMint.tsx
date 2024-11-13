@@ -1,7 +1,7 @@
-// app/components/CreditCardMint.tsx
+// components/CreditCardMint.tsx
 
 import { useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react"; // Import wallet adapter hooks
+import { useWalletStatus } from "./WalletStatus"; // Use the hook to get wallet status
 
 interface CreditCardFormData {
   cardNumber: string;
@@ -21,8 +21,8 @@ export default function CreditCardMint() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Wallet Adapter
-  const { connected, publicKey, connect, disconnect } = useWallet();
+  // Use wallet connection status
+  const { isWalletConnected, walletAddress } = useWalletStatus();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -38,11 +38,11 @@ export default function CreditCardMint() {
       // Process the payment using form data
       await processCreditCardPayment();
 
-      // Check if a wallet is connected, otherwise generate a custodial wallet
-      const walletAddress = connected && publicKey ? publicKey.toString() : await createCustodialWallet();
+      // Determine wallet address, either connected wallet or custodial
+      const address = isWalletConnected && walletAddress ? walletAddress : await createCustodialWallet();
 
-      // Perform the mint using the determined wallet address
-      await mintNFTToWallet(walletAddress);
+      // Mint the NFT to the determined wallet address
+      await mintNFTToWallet(address);
 
       setSuccess(true);
       setFormData({ cardNumber: "", expiryDate: "", cvv: "", name: "" });
@@ -54,19 +54,16 @@ export default function CreditCardMint() {
   };
 
   const processCreditCardPayment = async () => {
-    // Placeholder function to process credit card payment
     await new Promise((resolve) => setTimeout(resolve, 2000));
   };
 
   const createCustodialWallet = async (): Promise<string> => {
-    // Placeholder logic for creating a custodial wallet.
     console.log("Creating custodial wallet...");
     const custodialWalletAddress = "GeneratedCustodialWalletAddress";
     return custodialWalletAddress;
   };
 
   const mintNFTToWallet = async (walletAddress: string) => {
-    // Placeholder function to mint NFT to specified wallet address.
     console.log(`Minting NFT to wallet address: ${walletAddress}`);
     await new Promise((resolve) => setTimeout(resolve, 2000));
   };
@@ -77,15 +74,14 @@ export default function CreditCardMint() {
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {success && <p className="text-green-500 mb-4">Mint successful!</p>}
 
-      {/* Wallet Connection Option */}
-      {!connected && (
-        <button
-          onClick={() => connect()}
-          className="mb-4 px-4 py-2 bg-blue-600 rounded text-white"
-        >
-          Connect Wallet (Optional)
-        </button>
-      )}
+      {/* Wallet Connection Display */}
+      <div className="mb-4 text-center">
+        {isWalletConnected ? (
+          <p className="text-gray-300">Connected Wallet: {walletAddress}</p>
+        ) : (
+          <p className="text-gray-400">No wallet connected. Connect your wallet (optional).</p>
+        )}
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

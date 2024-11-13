@@ -1,35 +1,49 @@
 // components/WalletStatus.tsx
 
-import React, { useEffect } from "react";
-import { useAppKit, useAppKitAccount, useDisconnect } from "@reown/appkit/react";
+import { useEffect, useState } from "react";
+import { useAppKitAccount, useDisconnect, useAppKit } from "@reown/appkit/react";
 
 interface WalletStatusProps {
-  onConnectionChange?: (connected: boolean) => void;
+  onConnectionChange?: (isConnected: boolean) => void;
   label?: string;
 }
 
+// Hook for wallet connection status
+export function useWalletStatus() {
+  const { isConnected, address } = useAppKitAccount();
+  return {
+    isWalletConnected: isConnected,
+    walletAddress: address ? `${address.slice(0, 6)}...${address.slice(-6)}` : null,
+  };
+}
+
+// Main WalletStatus component
 export default function WalletStatus({ onConnectionChange, label = "Connect Wallet" }: WalletStatusProps) {
-  const { open } = useAppKit();
-  const { address, isConnected } = useAppKitAccount();
-  const { disconnect } = useDisconnect();
+  const { open } = useAppKit(); // Open the wallet connect modal
+  const { isConnected, address } = useAppKitAccount(); // Wallet connection status and address
+  const { disconnect } = useDisconnect(); // Disconnect handler
 
-  const formatAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-6)}`;
-
+  // Notify parent of connection changes
   useEffect(() => {
-    onConnectionChange?.(isConnected);
+    if (onConnectionChange) {
+      onConnectionChange(isConnected);
+    }
   }, [isConnected, onConnectionChange]);
 
   return (
-    <div className="flex flex-col items-center justify-center mb-4">
+    <div className="flex flex-col items-center">
       {isConnected ? (
-        <div className="flex flex-col items-center">
-          <span className="text-gray-300">Connected Wallet: {formatAddress(address)}</span>
-          <button onClick={disconnect} className="mt-2 px-4 py-1 bg-red-500 text-white rounded">
-            Disconnect Wallet
+        <>
+          <p className="text-gray-300">Connected: {address.slice(0, 6)}...{address.slice(-6)}</p>
+          <button onClick={disconnect} className="mt-2 px-4 py-2 bg-red-500 text-white rounded">
+            Disconnect
           </button>
-        </div>
+        </>
       ) : (
-        <button onClick={() => open({ view: "Connect" })} className="px-4 py-2 bg-blue-500 text-white rounded">
+        <button
+          onClick={() => open({ view: "Connect" })}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+        >
           {label}
         </button>
       )}
