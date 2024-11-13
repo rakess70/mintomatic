@@ -1,3 +1,5 @@
+// app/page.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,8 +12,11 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [mintMethod, setMintMethod] = useState<"wallet" | "credit-card">("wallet");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [isMinting, setIsMinting] = useState(false);
+  const [isMinted, setIsMinted] = useState(false);
 
   const candyMachineId = process.env.NEXT_PUBLIC_SOLANA_CANDY_MACHINE_ID as string;
+  const address = ""; // This should be your connected wallet address if using a wallet provider
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,6 +32,35 @@ export default function Home() {
 
     fetchData();
   }, [candyMachineId]);
+
+  // Minting function
+  const mintNFTWithWallet = async () => {
+    if (!isWalletConnected || !address) {
+      console.warn("Please connect your wallet to mint an NFT.");
+      return;
+    }
+
+    setIsMinting(true);
+    try {
+      const response = await fetch("/api/mint", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: address }),
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        console.log("Minting successful! Signature:", result.signature);
+        setIsMinted(true);
+      } else {
+        console.error("Minting failed:", result.message);
+      }
+    } catch (error) {
+      console.error("Minting failed:", error);
+    } finally {
+      setIsMinting(false);
+    }
+  };
 
   if (loading) return <p className="text-center text-white">Loading...</p>;
   if (!candyMachineData) return <p className="text-center text-white">Failed to load Candy Machine data.</p>;
@@ -79,7 +113,13 @@ export default function Home() {
               <div className="wallet-minting">
                 <WalletStatus onConnectionChange={setIsWalletConnected} label="Connect Wallet" />
                 {isWalletConnected ? (
-                  <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Mint NFT with Wallet</button>
+                  <button
+                    onClick={mintNFTWithWallet}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+                    disabled={isMinting}
+                  >
+                    {isMinting ? "Minting..." : isMinted ? "Minted!" : "Mint NFT with Wallet"}
+                  </button>
                 ) : (
                   <p className="text-gray-400">Please connect your wallet to mint with Solana.</p>
                 )}
