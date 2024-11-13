@@ -8,6 +8,7 @@ interface CreditCardFormData {
   expiryDate: string;
   cvv: string;
   name: string;
+  email: string;
 }
 
 export default function CreditCardMint() {
@@ -16,6 +17,7 @@ export default function CreditCardMint() {
     expiryDate: "",
     cvv: "",
     name: "",
+    email: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export default function CreditCardMint() {
       await mintNFTToWallet(address);
 
       setSuccess(true);
-      setFormData({ cardNumber: "", expiryDate: "", cvv: "", name: "" });
+      setFormData({ cardNumber: "", expiryDate: "", cvv: "", name: "", email: "" });
     } catch (err) {
       setError("Failed to process payment. Please try again.");
     } finally {
@@ -75,7 +77,7 @@ export default function CreditCardMint() {
       {success && <p className="text-green-500 mb-4">Mint successful!</p>}
 
       {/* Wallet Connection Display */}
-      <div className="mb-4 text-center">
+      <div className="mb-6 text-center">
         {isWalletConnected ? (
           <p className="text-gray-300">Connected Wallet: {walletAddress}</p>
         ) : (
@@ -92,6 +94,18 @@ export default function CreditCardMint() {
             value={formData.name}
             onChange={handleChange}
             className="w-full p-2 border border-gray-600 rounded bg-gray-800 text-white"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm mb-1">Email</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-600 rounded bg-gray-800 text-white"
+            placeholder="email@example.com"
             required
           />
         </div>
