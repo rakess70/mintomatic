@@ -4,16 +4,13 @@ import React, { useMemo } from "react";
 import { createAppKit } from "@reown/appkit/react";
 import { SolanaAdapter } from "@reown/appkit-adapter-solana/react";
 import { solana, solanaTestnet, solanaDevnet } from "@reown/appkit/networks";
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-} from "@solana/wallet-adapter-wallets";
+import { SolflareWalletAdapter } from "@solana/wallet-adapter-wallets"; // Removed PhantomWalletAdapter
 import { WalletProvider, ConnectionProvider } from "@solana/wallet-adapter-react";
 import { clusterApiUrl } from "@solana/web3.js";
 
-// Set up the Solana Adapter with supported wallets
+// Set up the Solana Adapter with supported wallets, omitting Phantom
 const solanaWeb3JsAdapter = new SolanaAdapter({
-  wallets: [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
+  wallets: [new SolflareWalletAdapter()],
 });
 
 // Use your Reown Cloud project ID
