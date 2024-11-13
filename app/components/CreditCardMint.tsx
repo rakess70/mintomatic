@@ -79,9 +79,9 @@ export default function CreditCardMint() {
       {/* Wallet Connection Display */}
       <div className="mb-6 text-center">
         {isWalletConnected ? (
-          <p className="text-gray-300">Connected Wallet: {walletAddress}</p>
+          <p className="text-gray-300">NFT will be sent to Wallet: {walletAddress}</p>
         ) : (
-          <p className="text-gray-400">No wallet connected. Connect your wallet (optional).</p>
+          <p className="text-gray-400">No wallet connected. We will create a custodial wallet for you or Connect your wallet (optional).</p>
         )}
       </div>
 
