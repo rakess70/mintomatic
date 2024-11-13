@@ -7,20 +7,20 @@ import { Connection } from "@solana/web3.js";
 import { fetchCandyMachineData } from "./lib/metaplexService";
 import CreditCardMint from "./components/CreditCardMint";
 import ConnectButton from "./components/ConnectButton";
-import { useAppKitAccount } from "@reown/appkit/react"; // Use the AppKit hook
+import { useAppKitAccount } from "@reown/appkit/react"; // Import the AppKit hook
 
 export default function Home() {
   const [referralID, setReferralID] = useState<string | null>(null);
   const [candyMachineData, setCandyMachineData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mintMethod, setMintMethod] = useState<"wallet" | "credit-card">("wallet");
-  
+
   const candyMachineId = process.env.NEXT_PUBLIC_SOLANA_CANDY_MACHINE_ID as string;
   const solanaRpc = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
   const defaultReferralCode = process.env.NEXT_PUBLIC_REFERRAL_RADIUS_DEFAULT_CODE || "DEFAULT-REFERRAL-CODE";
 
-  // AppKit account hook to access connection status
-  const { isConnected } = useAppKitAccount();
+  // AppKit hook to access account and connection status
+  const { address, isConnected } = useAppKitAccount();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,11 +97,18 @@ export default function Home() {
           <div className="p-4 bg-gray-800 rounded-lg text-center">
             {mintMethod === "wallet" && (
               <div className="wallet-minting">
-                <ConnectButton />
-                {isConnected && (
-                  <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-                    Mint NFT with Wallet
-                  </button>
+                {/* Display wallet address if connected, else show ConnectButton */}
+                {isConnected ? (
+                  <div>
+                    <p className="text-sm text-gray-400 mb-2">
+                      Connected Wallet: <span className="text-white">{address}</span>
+                    </p>
+                    <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+                      Mint NFT with Wallet
+                    </button>
+                  </div>
+                ) : (
+                  <ConnectButton />
                 )}
               </div>
             )}
