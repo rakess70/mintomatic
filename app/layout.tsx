@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import WalletProviderWrapper from "./WalletProviderWrapper";
-import ConnectButton from "./components/ConnectButton";
 import { fetchCandyMachineData } from "./lib/metaplexService";
 
 const inter = Inter({ subsets: ["latin"] });
