@@ -38,9 +38,6 @@ export default function RootLayout({
       <head></head>
       <body className={inter.className}>
         <WalletProviderWrapper>
-          <div className="top-bar">
-            <ConnectButton />
-          </div>
           {children}
         </WalletProviderWrapper>
       </body>
