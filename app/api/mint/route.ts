@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { PublicKey as SolanaPublicKey } from '@solana/web3.js';
 import { mintV2 } from '@metaplex-foundation/mpl-candy-machine';
 import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
@@ -13,28 +13,28 @@ const umi = createUmi(process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.devnet.
   .use(mplCandyMachine());
 
 // Define the POST handler for minting
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: NextRequest) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+    return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
   }
 
-  const { walletAddress } = req.body;
+  // Parse the JSON body
+  const { walletAddress } = await req.json();
   const candyMachineId = process.env.NEXT_PUBLIC_SOLANA_CANDY_MACHINE_ID;
   const collectionMintId = process.env.NEXT_PUBLIC_COLLECTION_MINT_ID;
 
   if (!walletAddress || !candyMachineId || !collectionMintId) {
-    return res.status(400).json({ message: 'Missing required parameters' });
+    return NextResponse.json({ message: 'Missing required parameters' }, { status: 400 });
   }
 
   try {
-    // Use `@solana/web3.js` `PublicKey` and cast to Umi's `PublicKey` type as needed
     const candyMachinePublicKey = new SolanaPublicKey(candyMachineId) as unknown as UmiPublicKey;
     const collectionMint = new SolanaPublicKey(collectionMintId) as unknown as UmiPublicKey;
 
     // Convert Buffer to Uint8Array
     const candyMachineSeed = Uint8Array.from(Buffer.from("candy_machine"));
 
-    // Generate the PDA for the Candy Machine.
+    // Generate the PDA for the Candy Machine
     const candyMachinePda = await umi.eddsa.findPda(candyMachinePublicKey, [
       candyMachineSeed,
     ]);
@@ -58,9 +58,9 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
     const signature = await txBuilder.sendAndConfirm(umi);
     console.log('Mint transaction confirmed with signature:', signature);
 
-    res.status(200).json({ success: true, signature });
+    return NextResponse.json({ success: true, signature });
   } catch (error) {
     console.error('Minting failed:', error);
-    res.status(500).json({ success: false, message: 'Minting failed', error: error.toString() });
+    return NextResponse.json({ success: false, message: 'Minting failed', error: error.toString() }, { status: 500 });
   }
 }
