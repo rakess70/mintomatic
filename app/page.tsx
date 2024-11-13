@@ -39,7 +39,7 @@ export default function Home() {
     const fetchData = async () => {
       try {
         const data = await fetchCandyMachineData(candyMachineId);
-        console.log("Fetched Candy Machine Data on Mint Page:", data); // Log the fetched data for debugging
+        // console.log("Fetched Candy Machine Data on Mint Page:", data);
         setCandyMachineData(data);
       } catch (error) {
         console.error("Failed to fetch Candy Machine data:", error);
