@@ -1,16 +1,15 @@
-// app/layout.ts
+// app/layout.tsx
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import WalletProviderWrapper from "./WalletProviderWrapper";
 import ConnectButton from "./components/ConnectButton";
-import { fetchCandyMachineData } from "./lib/metaplexService"; // Import the data fetcher
+import { fetchCandyMachineData } from "./lib/metaplexService";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
-  // Retrieve Candy Machine ID from environment variable
   const candyMachineId = process.env.NEXT_PUBLIC_SOLANA_CANDY_MACHINE_ID;
   
   if (!candyMachineId) {
@@ -25,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: data?.collectionName ? `${data.collectionName} Minting Button` : "Minting Button",
-    description: "Powered by Mintomatic and Referral Radius by Bellwether Online Solutions",
+    description: "Crossmint and Affiliate Integrated",
   };
 }
 
@@ -39,7 +38,9 @@ export default function RootLayout({
       <head></head>
       <body className={inter.className}>
         <WalletProviderWrapper>
-          <ConnectButton />
+          <div className="top-bar">
+            <ConnectButton />
+          </div>
           {children}
         </WalletProviderWrapper>
       </body>
