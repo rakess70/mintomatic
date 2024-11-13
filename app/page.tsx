@@ -1,20 +1,26 @@
+// app/page.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { Connection } from "@solana/web3.js";
 import { fetchCandyMachineData } from "./lib/metaplexService";
-import ConnectButton from "./components/ConnectButton"; // Import ConnectButton component
-import CreditCardMint from "./components/CreditCardMint"; // Import Credit Card Mint component
+import CreditCardMint from "./components/CreditCardMint";
+import ConnectButton from "./components/ConnectButton";
+import { useAppKitAccount } from "@reown/appkit/react"; // Use the AppKit hook
 
 export default function Home() {
   const [referralID, setReferralID] = useState<string | null>(null);
   const [candyMachineData, setCandyMachineData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [mintMethod, setMintMethod] = useState<"wallet" | "credit-card">("wallet"); // State to toggle tabs
-
+  const [mintMethod, setMintMethod] = useState<"wallet" | "credit-card">("wallet");
+  
   const candyMachineId = process.env.NEXT_PUBLIC_SOLANA_CANDY_MACHINE_ID as string;
   const solanaRpc = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.mainnet-beta.solana.com";
   const defaultReferralCode = process.env.NEXT_PUBLIC_REFERRAL_RADIUS_DEFAULT_CODE || "DEFAULT-REFERRAL-CODE";
+
+  // AppKit account hook to access connection status
+  const { isConnected } = useAppKitAccount();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,24 +53,24 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
       <div className="w-full max-w-4xl mx-auto flex flex-col md:flex-row p-6 bg-gray-900 rounded-lg">
         {/* Left Column */}
-        <div className="md:w-1/2 md:pr-6 mb-6 md:mb-0">
-          <h1 className="text-3xl font-bold mb-4 text-center md:text-left">
+        <div className="md:w-1/2 md:pr-6 mb-6 md:mb-0 text-center">
+          <h1 className="text-3xl font-bold mb-4">
             Mint Your {candyMachineData.collectionName} NFT
           </h1>
-          <p className="text-lg text-gray-300 mb-4 text-center md:text-left">
+          <p className="text-lg text-gray-300 mb-4">
             Join the exclusive collection of {candyMachineData.itemsAvailable} unique NFTs!
           </p>
-          <div className="mb-4 flex justify-center md:justify-start">
+          <div className="mb-4">
             <img
               src={candyMachineData.collectionImage || ""}
               alt={candyMachineData.collectionName}
-              className="w-64 h-64 object-cover rounded-lg"
+              className="w-64 h-64 object-cover rounded-lg mx-auto"
             />
           </div>
-          <p className="text-xl font-semibold mb-2 text-center md:text-left">
+          <p className="text-xl font-semibold mb-2">
             Remaining Supply: {candyMachineData.itemsRemaining} / {candyMachineData.itemsAvailable}
           </p>
-          <p className="text-lg text-gray-300 mb-4 text-center md:text-left">
+          <p className="text-lg text-gray-300 mb-4">
             Price: {candyMachineData.price} {candyMachineData.currency} + minting fees
           </p>
         </div>
@@ -88,18 +94,20 @@ export default function Home() {
           </div>
 
           {/* Tab Content */}
-          <div className="p-4 bg-gray-800 rounded-lg">
+          <div className="p-4 bg-gray-800 rounded-lg text-center">
             {mintMethod === "wallet" && (
-              <div className="wallet-minting text-center">
+              <div className="wallet-minting">
                 <ConnectButton />
-                <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-                  Mint NFT with Wallet
-                </button>
+                {isConnected && (
+                  <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+                    Mint NFT with Wallet
+                  </button>
+                )}
               </div>
             )}
 
             {mintMethod === "credit-card" && (
-              <div className="credit-card-minting text-center">
+              <div className="credit-card-minting">
                 <CreditCardMint />
               </div>
             )}
