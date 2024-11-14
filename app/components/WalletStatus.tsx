@@ -1,7 +1,7 @@
 // components/WalletStatus.tsx
 
 import { useEffect } from "react";
-import { useAppKitAccount, useDisconnect, useAppKit } from "@reown/appkit/react";
+import { useAppKitAccount, useDisconnect } from "@reown/appkit/react";
 
 interface WalletStatusProps {
   onConnectionChange?: (isConnected: boolean, walletAddress: string | null) => void;
@@ -19,9 +19,8 @@ export function useWalletStatus() {
 
 // Main WalletStatus component
 export default function WalletStatus({ onConnectionChange, label = "Connect Wallet" }: WalletStatusProps) {
-  const { open } = useAppKit(); // Open the wallet connect modal
-  const { isConnected, address } = useAppKitAccount(); // Wallet connection status and address
-  const { disconnect } = useDisconnect(); // Disconnect handler
+  const { isConnected, address } = useAppKitAccount();
+  const { disconnect } = useDisconnect();
 
   // Notify parent of connection changes
   useEffect(() => {
@@ -29,12 +28,6 @@ export default function WalletStatus({ onConnectionChange, label = "Connect Wall
       onConnectionChange(isConnected, address || null); // Pass both connection status and address
     }
   }, [isConnected, address, onConnectionChange]);
-
-  const handleOpen = () => {
-    open({
-      view: "Connect", // Open wallet connect modal
-    });
-  };
 
   return (
     <div className="flex flex-col items-center">
@@ -46,12 +39,8 @@ export default function WalletStatus({ onConnectionChange, label = "Connect Wall
           </button>
         </>
       ) : (
-        <button
-          onClick={handleOpen} // Call handleOpen without chainId and rpc
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          {label}
-        </button>
+        // Adjusting <appkit-button /> to use the `label` and `size` properties
+        <appkit-button label={label}></appkit-button>
       )}
     </div>
   );
