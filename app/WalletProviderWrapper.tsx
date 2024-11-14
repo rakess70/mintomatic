@@ -33,6 +33,8 @@ const metadata = {
 
 // Initialize AppKit outside the component to prevent rerenders
 createAppKit({
+  defaultNetwork: solana,
+  debug: true,
   adapters: [solanaWeb3JsAdapter],
   networks: [solanaNetwork],
   metadata: metadata,
